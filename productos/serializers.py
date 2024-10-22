@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Tienda, Producto, Inventario
+from .models import Tienda, Producto
 
 class TiendaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,9 +30,4 @@ class ProductoSerializer(serializers.ModelSerializer):
     def validate_nombre(self, data):
         if len(data) < 2:
             raise serializers.ValidationError("El nombre debe tener al menos 2 caracteres.")
-        return data
-
-    def validate(self, data):
-        if data['cantidad'] < 0:
-            raise serializers.ValidationError("La cantidad no puede ser negativa.")
         return data

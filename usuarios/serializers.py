@@ -6,7 +6,7 @@ class RegistroSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Usuario
-        fields = ['username', 'first_name', 'last_name', 'email', 'password', 'direccion', 'telefono', 'rol']
+        fields = ['id', 'username', 'first_name', 'last_name', 'email', 'password', 'direccion', 'telefono', 'rol']
 
     def create(self, validated_data):
         if Usuario.objects.filter(username=validated_data['username']).exists():

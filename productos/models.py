@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from usuarios.models import Usuario
+from django.core.exceptions import ValidationError
 
 class Tienda(models.Model):
     nombre = models.CharField(max_length=100, blank=False, null=False)
@@ -18,6 +19,12 @@ class Tienda(models.Model):
 
     def __str__(self):
         return self.nombre
+    
+    def save(self, *args, **kwargs):
+        # Verificar si el propietario tiene el rol "tienda"
+        if self.propietario.rol != 'tienda':
+            raise ValidationError("El propietario debe tener el rol 'tienda'.")
+        super(Tienda, self).save(*args, **kwargs)
 
 class Producto(models.Model):
     nombre = models.CharField(max_length=100, blank=False, null=False)
