@@ -1,7 +1,7 @@
 from rest_framework import generics, permissions
 from .models import Usuario
 from .serializers import RegistroSerializer
-from .permissions import EsUsuarioComprador, EsUsuarioTienda, IsDuenno
+from .permissions import IsDuenno
 
 class UsuarioListView(generics.ListAPIView):
     queryset = Usuario.objects.all()
