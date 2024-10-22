@@ -24,7 +24,4 @@ class UsuarioDetailView(generics.RetrieveUpdateDestroyAPIView):
         elif self.request.method in ['PUT', 'DELETE']:
             #Solo los usuarios dueños de sus cuentas pueden eliminarla o actualizarla
             return [permissions.IsAdminUser(), IsDuenno()]
-        elif self.request.method in ['PUT', 'DELETE']:
-            # Solo los usuarios dueños de sus cuentas pueden eliminarlas o actualizarlas
-            return [IsDuenno()]
         return [permissions.IsAuthenticated()]  # Default a `IsAuthenticated` para otros métodos
