@@ -11,7 +11,7 @@ class TiendaSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError('Solo los usuarios con el rol de "tienda" pueden ser propietarios de una tienda.')
         return value
     
-class Producto(serializers.ModelSerializer):
+class ProductoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Producto
         fields = '__all__'
