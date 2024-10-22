@@ -16,11 +16,6 @@ class Producto(serializers.ModelSerializer):
         model = Producto
         fields = '__all__'
 
-class Inventario(serializers.ModelSerializer):
-    class Meta:
-        model = Inventario
-        fields = ['id', 'tienda', 'producto', 'cantidad']
-
     def validate(self, data):
         if data['cantidad'] < 0:
             raise serializers.ValidationError("La cantidad no puede ser negativa.")
