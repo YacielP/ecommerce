@@ -28,6 +28,7 @@ class Tienda(models.Model):
 
 class Producto(models.Model):
     nombre = models.CharField(max_length=100, blank=False, null=False)
+    precio = models.FloatField(validators=[MinValueValidator(0.99)], default=0.99)
     descripcion = models.TextField(blank=True, null=True, default='')
     cantidad = models.PositiveIntegerField(validators=[MinValueValidator(1)], default=1)
     tienda = models.ForeignKey(Tienda, on_delete=models.CASCADE, related_name='productos', blank=False, null=False)
