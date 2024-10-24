@@ -9,7 +9,12 @@ donde los productos se almacenan antes de confirmar la compra
 """
 class Carrito(models.Model):
     usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='carrito')
-
+    
+    """
+        Para mas adelante mejorar la funcionalidad de RealizarPedido,
+        que se puedan crear varios pedidos de diferentes tiendas y asi
+        calcular el total
+    """
     def total(self):
         return sum(item.subtotal for item in self.items.all())
     
@@ -20,17 +25,17 @@ class ItemCarrito(models.Model):
     carrito = models.ForeignKey(Carrito, related_name='items', on_delete=models.CASCADE)
     producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
     cantidad = models.PositiveIntegerField(default=1)
-    subtotal = models.FloatField()
+    subtotal = models.FloatField(default=0)
 
     def save(self, *args, **kwargs):
-        self.subtotal = self.producto * self.cantidad
+        self.subtotal = self.producto.precio * float(self.cantidad)
         super().save(*args, **kwargs)
 
     def __str__(self):
         return f'{self.cantidad} x {self.producto.nombre}'
 
 """
-Representa una compra finalizada que registra información
+Pedido y detallePedido representan una compra finalizada que registra información
 esencial del pedido
 """
 class Pedido(models.Model):
