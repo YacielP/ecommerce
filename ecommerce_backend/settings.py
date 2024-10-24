@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'usuarios.apps.UsuariosConfig',
     'productos.apps.ProductosConfig',
+    'pedidos.apps.PedidosConfig',
 ]
 
 # Configurar DRF para usar Simple JWT
