@@ -8,4 +8,5 @@ urlpatterns = [
     path('productos/', views.ProductoListView.as_view(), name='producto-list'),
     path('producto/create/', views.ProductoCreateView.as_view(), name='producto-create'),
     path('producto/<int:pk>/', views.ProductDetailView.as_view(), name='producto-detail'),
+    path('producto/agregar/', views.AgregarProductoInventarioView.as_view(), name='agregar-producto'),
 ]
