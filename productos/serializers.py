@@ -1,5 +1,18 @@
 from rest_framework import serializers
-from .models import Tienda, Producto
+from .models import Tienda, ProductoCentral, InventarioProducto
+
+class ProductoCentralSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductoCentral
+        fields = ['id', 'nombre', 'descripcion']
+
+class InventarioProductoSerializer(serializers.ModelSerializer):
+    producto_central = ProductoCentralSerializer()
+
+    class Meta:
+        model = InventarioProducto
+        fields = ['id', 'producto_central', 'cantidad', 'precio_personalizado']
+
 
 class TiendaSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,15 +32,4 @@ class TiendaSerializer(serializers.ModelSerializer):
     def validate_direccion(self, data):
         if len(data) < 5:
             raise serializers.ValidationError("La dirección debe tener al menos 5 caracteres.")
-        return data
-
-    
-class ProductoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Producto
-        fields = '__all__'
-
-    def validate_nombre(self, data):
-        if len(data) < 2:
-            raise serializers.ValidationError("El nombre debe tener al menos 2 caracteres.")
         return data

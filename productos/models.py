@@ -26,12 +26,25 @@ class Tienda(models.Model):
             raise ValidationError("El propietario debe tener el rol 'tienda'.")
         super(Tienda, self).save(*args, **kwargs)
 
-class Producto(models.Model):
+class ProductoCentral(models.Model):
     nombre = models.CharField(max_length=100, blank=False, null=False)
-    precio = models.FloatField(validators=[MinValueValidator(0.99)], default=0.99)
     descripcion = models.TextField(blank=True, null=True, default='')
-    cantidad = models.PositiveIntegerField(validators=[MinValueValidator(1)], default=1)
-    tienda = models.ForeignKey(Tienda, on_delete=models.CASCADE, related_name='productos', blank=False, null=False)
 
     def __str__(self):
         return self.nombre
+
+class Inventario(models.Model):
+    tienda = models.OneToOneField(Tienda, on_delete=models.CASCADE, related_name='inventario')
+
+    def __str__(self):
+        return f'Inventario de la tienda {self.tienda.nombre}'
+
+class InventarioProducto(models.Model):
+    inventario = models.ForeignKey(Inventario, on_delete=models.CASCADE)
+    producto_central = models.ForeignKey(ProductoCentral, on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField()
+    precio_personalizado = models.FloatField(validators=[MinValueValidator(0.99)])
+
+    def __str__(self):
+        return f'{self.producto_central.nombre} - {self.cantidad} disponible(s) en {self.inventario.tienda.nombre}'
+    
