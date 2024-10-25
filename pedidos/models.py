@@ -1,6 +1,6 @@
 from django.db import models
 from usuarios.models import Usuario
-from productos.models import Producto, Tienda
+from productos.models import InventarioProducto, Tienda
 from django.utils import timezone
 
 """
@@ -23,16 +23,22 @@ class Carrito(models.Model):
     
 class ItemCarrito(models.Model):
     carrito = models.ForeignKey(Carrito, related_name='items', on_delete=models.CASCADE)
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    inventario_producto = models.ForeignKey(InventarioProducto, on_delete=models.CASCADE)
     cantidad = models.PositiveIntegerField(default=1)
     subtotal = models.FloatField(default=0)
 
     def save(self, *args, **kwargs):
-        self.subtotal = self.producto.precio * float(self.cantidad)
-        super().save(*args, **kwargs)
+        if self.cantidad <= self.inventario_producto.cantidad:
+            self.inventario_producto.cantidad -= self.cantidad
+            self.inventario_producto.save()
+            self.subtotal = self.inventario_producto.precio_personalizado * self.cantidad
+            super().save(*args, **kwargs)
+        else:
+            raise ValueError("Cantidad no disponible en inventario")
 
     def __str__(self):
-        return f'{self.cantidad} x {self.producto.nombre}'
+        return f'{self.cantidad} x {self.inventario_producto.producto_central.nombre}'
+
 
 """
 Pedido y detallePedido representan una compra finalizada que registra información
@@ -53,13 +59,13 @@ class Pedido(models.Model):
 
 class DetallePedido(models.Model):
     pedido = models.ForeignKey(Pedido, related_name='detalles', on_delete=models.CASCADE)
-    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    inventario_producto = models.ForeignKey(InventarioProducto, on_delete=models.CASCADE)
     cantidad = models.PositiveIntegerField()
     subtotal = models.DecimalField(max_digits=10, decimal_places=2)
 
     def save(self, *args, **kwargs):
-        self.subtotal = self.producto.precio * self.cantidad
+        self.subtotal = self.inventario_producto.precio_personalizado * self.cantidad
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f'{self.cantidad} x {self.producto.nombre}'
+        return f'{self.cantidad} x {self.inventario_producto.producto_central.nombre}'

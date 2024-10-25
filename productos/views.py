@@ -2,21 +2,62 @@ from rest_framework import generics, permissions
 from usuarios.permissions import EsUsuarioTienda, EsUsuarioComprador
 from .permissions import IsPropietario
 from .serializers import TiendaSerializer, ProductoSerializer
-from .models import Tienda, Producto
+from .models import Tienda, ProductoCentral, Inventario, InventarioProducto
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .serializers import ProductoCentralSerializer, InventarioProductoSerializer
+
+class AgregarProductoInventarioView(APIView):
+    def post(self, request, *args, **kwargs):
+        tienda_id = request.data.get('tienda_id')
+        nombre_producto = request.data.get('nombre_producto')
+        cantidad = request.data.get('cantidad')
+        precio_personalizado = request.data.get('precio_personalizado')
+        descripcion = request.data.get('descripcion', '')
+
+        # Verificar si el producto ya existe
+        producto, created = ProductoCentral.objects.get_or_create(
+            nombre=nombre_producto, 
+            defaults={'descripcion': descripcion}
+        )
+
+        # Obtener el inventario de la tienda
+        inventario = Inventario.objects.get(tienda__id=tienda_id)
+
+        # Verificar si ya existe en el inventario
+        inventario_producto, inventario_created = InventarioProducto.objects.get_or_create(
+            inventario=inventario,
+            producto_central=producto,
+            defaults={'cantidad': cantidad, 'precio_personalizado': precio_personalizado}
+        )
+
+        if not inventario_created:
+            # Si ya existe, actualizar la cantidad y el precio personalizado
+            inventario_producto.cantidad += int(cantidad)
+            inventario_producto.precio_personalizado = precio_personalizado  # Actualizar el precio personalizado
+            inventario_producto.save()
+
+        return Response({
+            'producto': ProductoCentralSerializer(producto).data,
+            'inventario_producto': InventarioProductoSerializer(inventario_producto).data
+        }, status=status.HTTP_201_CREATED)
+
 
 class ProductoListView(generics.ListAPIView):
-    queryset = Producto.objects.all()
+    queryset = ProductoCentral.objects.all()
     serializer_class = ProductoSerializer
     permission_classes = [permissions.IsAdminUser]
 
 class ProductoCreateView(generics.CreateAPIView):
-    queryset = Producto.objects.all()
+    queryset = ProductoCentral.objects.all()
     serializer_class = ProductoSerializer
     permission_classes = [EsUsuarioTienda]
 
 
 class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Producto.objects.all()
+    queryset = ProductoCentral.objects.all()
     serializer_class = ProductoSerializer
 
     def get_permissions(self):
@@ -58,3 +99,4 @@ class TiendaDetailView(generics.RetrieveUpdateDestroyAPIView):
             #solo los propietarios y administradores pueden eliminar una tienda
             return [IsPropietario(), permissions.IsAdminUser()]
         return [permissions.IsAuthenticated()]
+    
