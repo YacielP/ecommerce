@@ -6,17 +6,17 @@ from productos.models import ProductoCentral, InventarioProducto
 from .models import Carrito, ItemCarrito, Pedido, DetallePedido
 
 class AgregarAlCarritoView(APIView):
-    def post(self, request, producto_id):
+    def post(self, request, tienda_id):
         usuario = request.user
-        producto = ProductoCentral.objects.get(id=producto_id)
+        nombre_producto = request.data.get('nombre_producto')
+        producto = InventarioProducto.objects.get(inventario__tienda__id=tienda_id, producto_central__nombre=nombre_producto)
         carrito, created = Carrito.objects.get_or_create(usuario=usuario)
 
-        inventario_producto = InventarioProducto.objects.get(producto_central=producto, inventario__tienda=usuario.tienda)
 
         item_carrito, created_item_carrito = ItemCarrito.objects.get_or_create(
             carrito=carrito,
-            inventario_producto=inventario_producto,
-            defaults={'cantidad': request.data.get('cantidad', 1)}
+            inventario_producto=producto,
+            defaults={'cantidad': int(request.data.get('cantidad', 1))}
         )
 
         if not created_item_carrito:
@@ -27,16 +27,17 @@ class AgregarAlCarritoView(APIView):
 
     
 class EliminarDelCarritoView(APIView):
-    def delete(self, request, producto_id):
+    def delete(self, request, tienda_id):
         usuario = request.user
-        producto = ProductoCentral.objects.get(id=producto_id)
+        nombre_producto = request.data.get('nombre_producto')
+        cantidad_a_eliminar = int(request.data.get('cantidad', 1))
+
+        producto = InventarioProducto.objects.get(inventario__tienda__id=tienda_id, producto_central__nombre=nombre_producto)
         carrito = Carrito.objects.get(usuario=usuario)
 
-        inventario_producto = InventarioProducto.objects.get(producto_central=producto, inventario__tienda=usuario.tienda)
-        item_carrito = ItemCarrito.objects.filter(carrito=carrito, inventario_producto=inventario_producto).first()
+        item_carrito = ItemCarrito.objects.filter(carrito=carrito, inventario_producto=producto).first()
 
         if item_carrito:
-            cantidad_a_eliminar = int(request.data.get('cantidad', 1))
             if item_carrito.cantidad > cantidad_a_eliminar:
                 item_carrito.cantidad -= cantidad_a_eliminar
                 item_carrito.save()
