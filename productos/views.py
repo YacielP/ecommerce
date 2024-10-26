@@ -19,6 +19,30 @@ class MostrarCatalogoView(generics.ListAPIView):
         except Tienda.DoesNotExist:
             return InventarioProducto.objects.none()
 
+class EliminarProductoInventarioView(APIView):
+    def delete(self, request):
+        tienda_id = request.data.get('tienda_id')
+        nombre_producto = request.data.get('nombre_producto')
+        cantidad = int(request.data.get('cantidad'))
+
+        inventario = Inventario.objects.get(tienda__id=tienda_id)
+        producto = InventarioProducto.objects.get(inventario=inventario, producto_central__nombre=nombre_producto)
+
+        if producto:
+            if cantidad < producto.cantidad:
+                producto.cantidad -= cantidad
+                producto.save()
+                return Response({'message': 'Producto actualizado en el inventario'}, status=status.HTTP_200_OK)
+            elif cantidad == producto.cantidad:
+                producto.delete()
+                return Response({'message': 'Producto eliminado del inventario'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'La cantidad que desea eliminar es mayor que la cantidad real'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        else:
+            return Response({'error': 'Producto no encontrado en el inventario.'}, status=status.HTTP_404_NOT_FOUND)
+        
+
 class AgregarProductoInventarioView(APIView):
     def post(self, request, *args, **kwargs):
         tienda_id = request.data.get('tienda_id')
