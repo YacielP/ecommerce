@@ -20,8 +20,8 @@ class MostrarCatalogoView(generics.ListAPIView):
             return InventarioProducto.objects.none()
 
 class EliminarProductoInventarioView(APIView):
-    def delete(self, request):
-        tienda_id = request.data.get('tienda_id')
+    def delete(self, request, pk, *args, **kwargs):
+        tienda_id = pk
         nombre_producto = request.data.get('nombre_producto')
         cantidad = int(request.data.get('cantidad'))
 
@@ -44,8 +44,8 @@ class EliminarProductoInventarioView(APIView):
         
 
 class AgregarProductoInventarioView(APIView):
-    def post(self, request, *args, **kwargs):
-        tienda_id = request.data.get('tienda_id')
+    def post(self, request, pk, *args, **kwargs):
+        tienda_id = pk
         nombre_producto = request.data.get('nombre_producto')
         cantidad = request.data.get('cantidad')
         precio_personalizado = request.data.get('precio_personalizado')

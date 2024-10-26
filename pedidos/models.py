@@ -28,16 +28,39 @@ class ItemCarrito(models.Model):
     subtotal = models.FloatField(default=0)
 
     def save(self, *args, **kwargs):
-        if self.cantidad <= self.inventario_producto.cantidad:
-            self.inventario_producto.cantidad -= self.cantidad
-            self.inventario_producto.save()
-            self.subtotal = self.inventario_producto.precio_personalizado * self.cantidad
-            super().save(*args, **kwargs)
-        else:
-            raise ValueError("Cantidad no disponible en inventario")
+        if self.pk is None:  # Nuevo ItemCarrito
+            if self.cantidad <= self.inventario_producto.cantidad:
+                self.inventario_producto.cantidad -= self.cantidad
+                self.inventario_producto.save()
+                self.subtotal = self.inventario_producto.precio_personalizado * self.cantidad
+                super().save(*args, **kwargs)
+            else:
+                raise ValueError("Cantidad no disponible en inventario")
+        else:  # ItemCarrito existente
+            original = ItemCarrito.objects.get(pk=self.pk)
+            cantidad_diferencia = self.cantidad - original.cantidad
+            if cantidad_diferencia > 0:  # Si se está incrementando
+                if cantidad_diferencia <= self.inventario_producto.cantidad:
+                    self.inventario_producto.cantidad -= cantidad_diferencia
+                    self.inventario_producto.save()
+                    self.subtotal = self.inventario_producto.precio_personalizado * self.cantidad
+                    super().save(*args, **kwargs)
+                else:
+                    raise ValueError("Cantidad no disponible en inventario")
+            elif cantidad_diferencia < 0:  # Si se está reduciendo
+                self.inventario_producto.cantidad -= cantidad_diferencia  # Añadir de vuelta al inventario
+                self.inventario_producto.save()
+                self.subtotal = self.inventario_producto.precio_personalizado * self.cantidad
+                super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        self.inventario_producto.cantidad += self.cantidad  # Devolver la cantidad al inventario
+        self.inventario_producto.save()
+        super().delete(*args, **kwargs)
 
     def __str__(self):
         return f'{self.cantidad} x {self.inventario_producto.producto_central.nombre}'
+
 
 
 """
