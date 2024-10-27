@@ -4,14 +4,19 @@ from rest_framework.views import APIView
 from django.db import transaction
 from productos.models import ProductoCentral, InventarioProducto
 from .models import Carrito, ItemCarrito, Pedido, DetallePedido
+from .permissions import IsCarritoOwner
+from usuarios.permissions import EsUsuarioComprador
 
 class AgregarAlCarritoView(APIView):
+    permission_classes = [IsCarritoOwner, EsUsuarioComprador]
+
     def post(self, request, tienda_id):
         usuario = request.user
         nombre_producto = request.data.get('nombre_producto')
         producto = InventarioProducto.objects.get(inventario__tienda__id=tienda_id, producto_central__nombre=nombre_producto)
         carrito, created = Carrito.objects.get_or_create(usuario=usuario)
 
+        self.check_object_permissions(request, carrito)
 
         item_carrito, created_item_carrito = ItemCarrito.objects.get_or_create(
             carrito=carrito,
@@ -27,6 +32,8 @@ class AgregarAlCarritoView(APIView):
 
     
 class EliminarDelCarritoView(APIView):
+    permission_classes = [IsCarritoOwner, EsUsuarioComprador]
+
     def delete(self, request, tienda_id):
         usuario = request.user
         nombre_producto = request.data.get('nombre_producto')
@@ -34,6 +41,8 @@ class EliminarDelCarritoView(APIView):
 
         producto = InventarioProducto.objects.get(inventario__tienda__id=tienda_id, producto_central__nombre=nombre_producto)
         carrito = Carrito.objects.get(usuario=usuario)
+
+        self.check_object_permissions(request, carrito)
 
         item_carrito = ItemCarrito.objects.filter(carrito=carrito, inventario_producto=producto).first()
 

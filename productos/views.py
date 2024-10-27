@@ -5,10 +5,14 @@ from .models import Tienda, ProductoCentral, Inventario, InventarioProducto
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import InventarioProductoFilter
 
 class MostrarCatalogoView(generics.ListAPIView):
     serializer_class = InventarioProductoSerializer
     permission_classes = [IsDuenno, EsUsuarioComprador]
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = InventarioProductoFilter
 
     def get_queryset(self):
         tienda_id = self.kwargs['pk']
