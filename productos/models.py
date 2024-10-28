@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from usuarios.models import Usuario
 from django.core.exceptions import ValidationError
+from categorias.models import Categoria
 
 class Tienda(models.Model):
     nombre = models.CharField(max_length=100, blank=False, null=False)
@@ -29,6 +30,7 @@ class Tienda(models.Model):
 class ProductoCentral(models.Model):
     nombre = models.CharField(max_length=100, blank=False, null=False)
     descripcion = models.TextField(blank=True, null=True, default='')
+    categoria = models.ForeignKey(Categoria, on_delete=models.SET_NULL, null=True, blank=True, related_name='productos')
 
     def __str__(self):
         return self.nombre
