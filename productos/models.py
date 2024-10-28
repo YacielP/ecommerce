@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from usuarios.models import Usuario
 from django.core.exceptions import ValidationError
 
@@ -44,6 +44,7 @@ class InventarioProducto(models.Model):
     producto_central = models.ForeignKey(ProductoCentral, on_delete=models.CASCADE)
     cantidad = models.PositiveIntegerField()
     precio_personalizado = models.FloatField(validators=[MinValueValidator(0.99)])
+    resenna = models.DecimalField(max_digits=2, decimal_places=1, validators=[MinValueValidator(1.0), MaxValueValidator(5.0)], default=0)
 
     def __str__(self):
         return f'{self.producto_central.nombre} - {self.cantidad} disponible(s) en {self.inventario.tienda.nombre}'

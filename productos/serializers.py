@@ -11,7 +11,7 @@ class InventarioProductoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = InventarioProducto
-        fields = ['id', 'producto_central', 'cantidad', 'precio_personalizado']
+        fields = ['id', 'producto_central', 'cantidad', 'precio_personalizado', 'resenna']
 
 
 class TiendaSerializer(serializers.ModelSerializer):
