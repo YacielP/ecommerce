@@ -7,6 +7,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import InventarioProductoFilter
+from rest_framework import viewsets
+from categorias.models import Categoria
+
+class InventarioProductoViewSet(viewsets.ModelViewSet):
+    queryset = InventarioProducto.objects.all()
+    serializer_class = InventarioProductoSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = InventarioProductoFilter
 
 class MostrarCatalogoView(generics.ListAPIView):
     serializer_class = InventarioProductoSerializer
@@ -54,11 +62,19 @@ class AgregarProductoInventarioView(APIView):
         cantidad = request.data.get('cantidad')
         precio_personalizado = request.data.get('precio_personalizado')
         descripcion = request.data.get('descripcion', '')
+        descripcion_categoria = request.data.get('descripcion_categoria', '')
+        nombre_categoria = request.data.get('nombre_categoria', '')
+
+        #Verificar si la categoria ya existe
+        categoria, created = Categoria.objects.get_or_create(
+            nombre=nombre_categoria,
+            defaults={'descripcion': descripcion_categoria}
+        )
 
         # Verificar si el producto ya existe
         producto, created = ProductoCentral.objects.get_or_create(
             nombre=nombre_producto, 
-            defaults={'descripcion': descripcion}
+            defaults={'descripcion': descripcion, 'categoria': categoria}
         )
 
         # Obtener el inventario de la tienda
