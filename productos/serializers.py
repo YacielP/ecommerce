@@ -1,10 +1,13 @@
 from rest_framework import serializers
 from .models import Tienda, ProductoCentral, InventarioProducto
+from categorias.serializers import CategoriaSerializer
 
 class ProductoCentralSerializer(serializers.ModelSerializer):
+    categoria = CategoriaSerializer()
+
     class Meta:
         model = ProductoCentral
-        fields = ['id', 'nombre', 'descripcion']
+        fields = ['id', 'nombre', 'descripcion', 'categoria']
 
 class InventarioProductoSerializer(serializers.ModelSerializer):
     producto_central = ProductoCentralSerializer()
