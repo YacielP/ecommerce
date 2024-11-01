@@ -11,4 +11,7 @@ class EsUsuarioComprador(BasePermission):
     
 class IsDuenno(BasePermission):
     def has_object_permission(self, request, view, obj):
-        return obj == request.user
+        if hasattr(obj, 'inventario'):
+            return obj.inventario.tienda.propietario == request.user
+        if hasattr(obj, 'usuario'):
+            return obj.usuario == request.user
