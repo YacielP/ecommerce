@@ -9,9 +9,7 @@ class EsUsuarioComprador(BasePermission):
         return request.user and request.user.rol == 'comprador'
 
     
-class IsDuenno(BasePermission):
+class IsOwnerOrAdmin(BasePermission):
     def has_object_permission(self, request, view, obj):
-        if hasattr(obj, 'inventario'):
-            return obj.inventario.tienda.propietario == request.user
-        if hasattr(obj, 'usuario'):
-            return obj.usuario == request.user
+        if request.user.is_staff or obj == request.user:
+            return True
