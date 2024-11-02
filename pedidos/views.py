@@ -8,7 +8,7 @@ from .permissions import IsCarritoOwner
 from usuarios.permissions import EsUsuarioComprador
 
 class AgregarAlCarritoView(APIView):
-    permission_classes = [IsCarritoOwner, EsUsuarioComprador]
+    permission_classes = [IsCarritoOwner]
 
     def post(self, request, tienda_id):
         usuario = request.user
@@ -32,7 +32,7 @@ class AgregarAlCarritoView(APIView):
 
     
 class EliminarDelCarritoView(APIView):
-    permission_classes = [IsCarritoOwner, EsUsuarioComprador]
+    permission_classes = [IsCarritoOwner]
 
     def delete(self, request, tienda_id):
         usuario = request.user
