@@ -5,10 +5,6 @@ from .serializers import ComentarioSerializer
 from productos.permissions import EsCompradorOPropietario
 from .permissions import IsOwnerComentario
 
-
-"""
-AQUI HAY Q ARREGLAR LA TALLA DE LOS PERMISOS
-"""
 class ComentarioViewSet(viewsets.ModelViewSet):
     serializer_class = ComentarioSerializer
     permission_classes = [EsCompradorOPropietario]
