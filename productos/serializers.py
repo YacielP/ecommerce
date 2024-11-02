@@ -10,11 +10,15 @@ class ProductoCentralSerializer(serializers.ModelSerializer):
         fields = ['id', 'nombre', 'descripcion', 'categoria']
 
 class InventarioProductoSerializer(serializers.ModelSerializer):
+    tienda_nombre = serializers.SerializerMethodField()
     producto_central = ProductoCentralSerializer()
 
     class Meta:
         model = InventarioProducto
-        fields = ['id', 'producto_central', 'cantidad', 'precio_personalizado', 'resenna']
+        fields = ['id', 'producto_central', 'cantidad', 'precio_personalizado', 'resenna', 'tienda_nombre']
+
+    def get_tienda_nombre(self, obj):
+        return obj.inventario.tienda.nombre
 
 
 class TiendaSerializer(serializers.ModelSerializer):

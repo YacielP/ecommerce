@@ -1,5 +1,6 @@
 from rest_framework import generics, permissions
-from usuarios.permissions import EsUsuarioTienda, EsUsuarioComprador, IsDuenno
+from usuarios.permissions import EsUsuarioTienda, EsUsuarioComprador
+from .permissions import EsCompradorOPropietario, EsPropietario
 from .serializers import TiendaSerializer, ProductoCentralSerializer, InventarioProductoSerializer
 from .models import Tienda, ProductoCentral, Inventario, InventarioProducto
 from rest_framework import status
@@ -13,17 +14,18 @@ from categorias.models import Categoria
 class InventarioProductoViewSet(viewsets.ModelViewSet):
     queryset = InventarioProducto.objects.all()
     serializer_class = InventarioProductoSerializer
+    permission_classes = [EsUsuarioComprador]
     filter_backends = [DjangoFilterBackend]
     filterset_class = InventarioProductoFilter
 
 class MostrarCatalogoView(generics.ListAPIView):
     serializer_class = InventarioProductoSerializer
-    permission_classes = [IsDuenno, EsUsuarioComprador]
+    permission_classes = [EsCompradorOPropietario]
     filter_backends = [DjangoFilterBackend]
     filterset_class = InventarioProductoFilter
 
     def get_queryset(self):
-        tienda_id = self.kwargs['pk']
+        tienda_id = self.kwargs['tienda_id']
         try:
             tienda = Tienda.objects.get(id=tienda_id)
             inventario = Inventario.objects.get(tienda=tienda)
@@ -97,36 +99,11 @@ class AgregarProductoInventarioView(APIView):
             'producto': ProductoCentralSerializer(producto).data,
             'inventario_producto': InventarioProductoSerializer(inventario_producto).data
         }, status=status.HTTP_201_CREATED)
-
-
-class ProductoCreateView(generics.CreateAPIView):
-    queryset = ProductoCentral.objects.all()
-    serializer_class = ProductoCentral
-    permission_classes = [EsUsuarioTienda]
-
-
-class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = ProductoCentral.objects.all()
-    serializer_class = ProductoCentral
-
-    def get_permissions(self):
-        if self.request.method == 'GET':
-            #Solo los propietarios o un usuario comprador puede ver los detalles de un producto
-            return [IsDuenno(), EsUsuarioComprador()]
-        
-        elif self.request.method == 'PUT':
-            #Solo los propietqarios pueden actualizar un producto
-            return [IsDuenno()]
-        
-        elif self.request.method == 'DELETE':
-            #Solo los propietarios o los administradores pueden borrar un producto
-            return [IsDuenno(), permissions.IsAdminUser()]
-        return [permissions.IsAuthenticated()]
     
 class TiendaListView(generics.ListAPIView):
     queryset = Tienda.objects.all()
     serializer_class = TiendaSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [EsUsuarioComprador]
 
 class TiendaCreateView(generics.CreateAPIView):
     queryset = Tienda.objects.all()
@@ -140,12 +117,12 @@ class TiendaDetailView(generics.RetrieveUpdateDestroyAPIView):
     def get_permissions(self):
         if self.request.method == 'GET':
             #Solo los usuarios compradores y los administradores pueden ver detalles de tiendas
-            return [EsUsuarioComprador(), permissions.IsAdminUser()]
+            return [EsUsuarioComprador()]
         elif self.request.method == 'PUT':
             #solo los propietarios pueden actualizar su tienda
-            return [IsDuenno()]
+            return [EsPropietario()]
         elif self.request.method == 'DELETE':
             #solo los propietarios y administradores pueden eliminar una tienda
-            return [IsDuenno(), permissions.IsAdminUser()]
+            return [EsPropietario()]
         return [permissions.IsAuthenticated()]
     
