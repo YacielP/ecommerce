@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'pedidos.apps.PedidosConfig',
     'categorias.apps.CategoriasConfig',
     'comentarios.apps.ComentariosConfig',
+    'logros.apps.LogrosConfig',
 ]
 
 # Configurar DRF para usar Simple JWT
