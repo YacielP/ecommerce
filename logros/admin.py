@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Logro, LogroTienda, LogroUsuario
 
-# Register your models here.
+admin.site.register(Logro)
+admin.site.register(LogroTienda)
+admin.site.register(LogroUsuario)
