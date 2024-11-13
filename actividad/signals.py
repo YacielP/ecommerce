@@ -67,7 +67,7 @@ def check_venta_archievements(tienda):
         "Tienda Novata": 1,
         "Superventas": 100
     }
-    otorgar_logros_usuario(tienda, total_ventas, logros)
+    otorgar_logros_tienda(tienda, total_ventas, logros)
 
 def otorgar_logros_usuario(user, total, logros):
     for logro_name, required in logros.items():
@@ -82,7 +82,7 @@ def otorgar_logros_usuario(user, total, logros):
 def otorgar_logros_tienda(tienda, total, logros):
     for logro_name, required in logros.items():
         if total == required:
-            logro = LogroTienda.objects.get(nombre=logro_name)
+            logro = Logro.objects.get(nombre=logro_name)
             if not LogroTienda.objects.filter(tienda=tienda, logro=logro):
                 LogroTienda.objects.create(
                     tienda=tienda,
