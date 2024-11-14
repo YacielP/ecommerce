@@ -90,3 +90,5 @@ def otorgar_logros_tienda(tienda, total, logros):
                     tienda=tienda,
                     logro=logro
                 )
+                tienda.puntos += logro.puntos
+                tienda.save()
