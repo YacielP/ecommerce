@@ -9,6 +9,7 @@ class Tienda(models.Model):
     direccion = models.CharField(max_length=200, blank=False, null=False)
     descripcion = models.TextField(null=True, blank=True, default='')
     propietario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='tiendas', null=False, blank=False)
+    puntos = models.PositiveIntegerField(default=0)
 
     # Contamos la variedad de productos. Ej: Producto A=5, Producto B=10, total=2
     def total_productos(self):
