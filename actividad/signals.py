@@ -79,6 +79,8 @@ def otorgar_logros_usuario(user, total, logros):
                     logro=logro
                 )
 
+
+#Funciones para otorgar logros a los usuarios y tiedas
 def otorgar_logros_tienda(tienda, total, logros):
     for logro_name, required in logros.items():
         if total == required:
