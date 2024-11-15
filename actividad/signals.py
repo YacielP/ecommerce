@@ -78,6 +78,8 @@ def otorgar_logros_usuario(user, total, logros):
                     usuario=user,
                     logro=logro
                 )
+                user.puntos += logro.puntos
+                user.save()
 
 
 #Funciones para otorgar logros a los usuarios y tiedas
