@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Usuario
+from .models import Usuario, UsuarioComprador, UsuarioPropietario
 
 class RegistroSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -25,3 +25,15 @@ class RegistroSerializer(serializers.ModelSerializer):
             rol=validated_data.get('rol', 'comprador')
         )
         return user
+
+class CompradorSerializer(RegistroSerializer):
+
+    class Meta:
+        model = UsuarioComprador
+        fields = RegistroSerializer.Meta.fields + ['puntos']
+
+class PropietarioSerializer(RegistroSerializer):
+
+    class Meta:
+        model = UsuarioPropietario
+        fields = RegistroSerializer.Meta.fields
