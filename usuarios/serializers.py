@@ -38,6 +38,10 @@ class PropietarioSerializer(RegistroSerializer):
         model = UsuarioPropietario
         fields = RegistroSerializer.Meta.fields
 
+"""
+    Para las actualizaciones
+"""
+
 class UpdateCompradorSerializer(serializers.ModelSerializer):
     class Meta:
         model = UsuarioComprador
