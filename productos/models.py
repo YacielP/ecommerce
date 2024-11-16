@@ -1,6 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-from usuarios.models import Usuario
+from usuarios.models import UsuarioPropietario
 from django.core.exceptions import ValidationError
 from categorias.models import Categoria
 
@@ -8,7 +8,7 @@ class Tienda(models.Model):
     nombre = models.CharField(max_length=100, blank=False, null=False)
     direccion = models.CharField(max_length=200, blank=False, null=False)
     descripcion = models.TextField(null=True, blank=True, default='')
-    propietario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='tiendas', null=False, blank=False)
+    propietario = models.ForeignKey(UsuarioPropietario, on_delete=models.CASCADE, related_name='tiendas', null=False, blank=False)
     puntos = models.PositiveIntegerField(default=0)
 
     # Contamos la variedad de productos. Ej: Producto A=5, Producto B=10, total=2
