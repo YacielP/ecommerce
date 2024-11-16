@@ -4,7 +4,7 @@ from django.contrib.auth.models import AbstractUser
 class Usuario(AbstractUser):
     ROL_CHOICES = [
         ('superuser', 'Superuser'),
-        ('tienda', 'Tienda'),
+        ('propietario', 'Propietario'),
         ('comprador', 'Comprador'),
     ]
     rol = models.CharField(max_length=100, choices=ROL_CHOICES, default='comprador')
@@ -28,6 +28,6 @@ class UsuarioComprador(Usuario):
 class UsuarioPropietario(Usuario):
     
     def save(self, *args, **kwargs):
-        if self.rol != 'tienda':
+        if self.rol != 'propietario':
             raise ValueError("El rol debe de ser 'tienda' para un Propietario")
         super().save(*args, **kwargs)
