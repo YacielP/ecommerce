@@ -1,5 +1,5 @@
 from django.db import models
-from usuarios.models import Usuario
+from usuarios.models import UsuarioComprador
 from productos.models import Tienda
 
 class Logro(models.Model):
@@ -12,7 +12,7 @@ class Logro(models.Model):
         return self.nombre
     
 class LogroUsuario(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(UsuarioComprador, on_delete=models.CASCADE)
     logro = models.ForeignKey(Logro, on_delete=models.CASCADE)
     fecha_obtenido = models.DateTimeField(auto_now_add=True)
 
