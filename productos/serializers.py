@@ -27,8 +27,8 @@ class TiendaSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_propietario(self, data):
-        if data.rol != 'tienda':
-            raise serializers.ValidationError('Solo los usuarios con el rol de "tienda" pueden ser propietarios de una tienda.')
+        if data.rol != 'propietario':
+            raise serializers.ValidationError('Solo los usuarios con el rol de "propietario" pueden ser propietarios de una tienda.')
         return data
     
     def validate_nombre(self, data):
