@@ -1,5 +1,5 @@
 from django.db import models
-from usuarios.models import Usuario
+from usuarios.models import UsuarioComprador
 from productos.models import InventarioProducto, Tienda
 from django.utils import timezone
 
@@ -8,7 +8,7 @@ Carrito e ItemCarrito representan un estado temporal
 donde los productos se almacenan antes de confirmar la compra
 """
 class Carrito(models.Model):
-    usuario = models.OneToOneField(Usuario, on_delete=models.CASCADE, related_name='carrito')
+    usuario = models.OneToOneField(UsuarioComprador, on_delete=models.CASCADE, related_name='carrito')
     
     """
         Para mas adelante mejorar la funcionalidad de RealizarPedido,
@@ -68,7 +68,7 @@ Pedido y detallePedido representan una compra finalizada que registra informaci√
 esencial del pedido
 """
 class Pedido(models.Model):
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    usuario = models.ForeignKey(UsuarioComprador, on_delete=models.CASCADE)
     tienda = models.ForeignKey(Tienda, on_delete=models.CASCADE, related_name='pedidos')
     fecha_pedido = models.DateTimeField(default=timezone.now)
     total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
