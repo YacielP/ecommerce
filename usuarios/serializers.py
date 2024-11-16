@@ -37,3 +37,13 @@ class PropietarioSerializer(RegistroSerializer):
     class Meta:
         model = UsuarioPropietario
         fields = RegistroSerializer.Meta.fields
+
+class UpdateCompradorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UsuarioComprador
+        fields = ['first_name', 'last_name', 'direccion', 'telefono']
+
+class UpdateAdminSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Usuario
+        exclude = ['rol']
