@@ -1,14 +1,20 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-from usuarios.models import UsuarioPropietario
+from usuarios.models import Propietario
 from django.core.exceptions import ValidationError
 from categorias.models import Categoria
+
+"""
+HAY UNA INCONGRUENCIA CON RESPECTO AL CAMPO CATEGORIA
+YA QUE LOS PRODUCTOS CENTRALES SE ESTAN INSERTANDO DESDE INVENTARIOPRODUCTO
+ENTONCES CATEGORIA DEBERIA DE ESTAR AHI
+"""
 
 class Tienda(models.Model):
     nombre = models.CharField(max_length=100, blank=False, null=False)
     direccion = models.CharField(max_length=200, blank=False, null=False)
     descripcion = models.TextField(null=True, blank=True, default='')
-    propietario = models.ForeignKey(UsuarioPropietario, on_delete=models.CASCADE, related_name='tiendas', null=False, blank=False)
+    propietario = models.ForeignKey(Propietario, on_delete=models.CASCADE, related_name='tiendas', null=False, blank=False)
     puntos = models.PositiveIntegerField(default=0)
 
     # Contamos la variedad de productos. Ej: Producto A=5, Producto B=10, total=2
@@ -24,8 +30,8 @@ class Tienda(models.Model):
     
     def save(self, *args, **kwargs):
         # Verificar si el propietario tiene el rol "tienda"
-        if self.propietario.rol != 'tienda':
-            raise ValidationError("El propietario debe tener el rol 'tienda'.")
+        if self.propietario.rol != 'propietario':
+            raise ValidationError("El propietario debe tener el rol 'propietario'.")
         super(Tienda, self).save(*args, **kwargs)
 
 class ProductoCentral(models.Model):

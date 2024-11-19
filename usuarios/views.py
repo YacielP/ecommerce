@@ -1,5 +1,5 @@
 from rest_framework import generics, permissions
-from .models import Usuario, UsuarioComprador, UsuarioPropietario
+from .models import Usuario, Comprador, Propietario
 from .serializers import RegistroSerializer, CompradorSerializer, PropietarioSerializer, UpdateAdminSerializer, UpdateCompradorSerializer
 from .permissions import IsAdminOrPropieratio, IsOwnerOrAdminOrPropietario, IsAdminOrComprador, IsOwnerOrAdminOrComprador
 from rest_framework import viewsets
@@ -9,8 +9,8 @@ class UsuarioListView(generics.ListAPIView):
     serializer_class = RegistroSerializer
     permission_classes = [permissions.IsAdminUser]
     
-class UsuarioCompradorViewSet(viewsets.ModelViewSet):
-    queryset = UsuarioComprador
+class CompradorViewSet(viewsets.ModelViewSet):
+    queryset = Comprador
     serializer_class = CompradorSerializer
 
     def get_permissions(self):
@@ -28,15 +28,18 @@ class UsuarioCompradorViewSet(viewsets.ModelViewSet):
             if self.request.user.is_staff:
                 return UpdateAdminSerializer
             return UpdateCompradorSerializer
-        return UpdateCompradorSerializer
+        return CompradorSerializer
     
     def get_object(self):
         obj = super().get_object()
         self.check_object_permissions(self.request, obj)
         return obj
+    
+    def perform_create(self, serializer):
+        serializer.save()
 
-class UsuarioPropietarioViewSet(viewsets.ModelViewSet):
-    queryset = UsuarioPropietario.objects.all()
+class PropietarioViewSet(viewsets.ModelViewSet):
+    queryset = Propietario.objects.all()
     serializer_class = PropietarioSerializer
 
     def get_permissions(self):
@@ -51,8 +54,12 @@ class UsuarioPropietarioViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ['update', 'partial_update']:
             return UpdateAdminSerializer
+        return PropietarioSerializer
         
     def get_object(self):
         obj = super().get_object()
         self.check_object_permissions(self.request, obj)
         return obj
+    
+    def perform_create(self, serializer):
+        serializer.save()

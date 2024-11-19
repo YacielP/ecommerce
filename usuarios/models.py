@@ -17,7 +17,7 @@ class Usuario(AbstractUser):
     def __str__(self):
         return self.username
 
-class UsuarioComprador(Usuario):
+class Comprador(Usuario):
     puntos = models.IntegerField(default=0)
 
     def save(self, *args, **kwargs):
@@ -25,7 +25,7 @@ class UsuarioComprador(Usuario):
             raise ValueError("El rol debe de ser 'comprador' para un Comprador")
         super().save(*args, **kwargs)
 
-class UsuarioPropietario(Usuario):
+class Propietario(Usuario):
     
     def save(self, *args, **kwargs):
         if self.rol != 'propietario':

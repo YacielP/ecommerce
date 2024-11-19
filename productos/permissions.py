@@ -10,9 +10,9 @@ class EsCompradorOPropietario(BasePermission):
         tienda_id = view.kwargs['tienda_id']
         return request.user.tiendas.filter(id=tienda_id).exists()
 
-class EsPropietario(BasePermission):
+class IsOwner(BasePermission):
     """
-    Permiso personalizado para permitir acceso solo a los propietarios.
+    Permiso personalizado para permitir acceso solo a los propietarios de su tienda.
     """
 
     def has_permission(self, request, view):

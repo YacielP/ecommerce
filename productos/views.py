@@ -1,6 +1,6 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, viewsets
 from usuarios.permissions import EsUsuarioTienda, EsUsuarioComprador
-from .permissions import EsCompradorOPropietario, EsPropietario
+from .permissions import EsCompradorOPropietario, IsOwner
 from .serializers import TiendaSerializer, ProductoCentralSerializer, InventarioProductoSerializer
 from .models import Tienda, ProductoCentral, Inventario, InventarioProducto
 from rest_framework import status
@@ -10,6 +10,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .filters import InventarioProductoFilter
 from rest_framework import viewsets
 from categorias.models import Categoria
+from rest_framework import serializers
+from usuarios.models import Propietario
 
 class InventarioProductoViewSet(viewsets.ModelViewSet):
     queryset = InventarioProducto.objects.all()
@@ -58,8 +60,7 @@ class EliminarProductoInventarioView(APIView):
         
 
 class AgregarProductoInventarioView(APIView):
-    def post(self, request, pk, *args, **kwargs):
-        tienda_id = pk
+    def post(self, request, tienda_id, *args, **kwargs):
         nombre_producto = request.data.get('nombre_producto')
         cantidad = request.data.get('cantidad')
         precio_personalizado = request.data.get('precio_personalizado')
@@ -100,29 +101,30 @@ class AgregarProductoInventarioView(APIView):
             'inventario_producto': InventarioProductoSerializer(inventario_producto).data
         }, status=status.HTTP_201_CREATED)
     
-class TiendaListView(generics.ListAPIView):
-    queryset = Tienda.objects.all()
-    serializer_class = TiendaSerializer
-    permission_classes = [EsUsuarioComprador]
-
-class TiendaCreateView(generics.CreateAPIView):
-    queryset = Tienda.objects.all()
-    serializer_class = TiendaSerializer
-    permission_classes = [EsUsuarioTienda]
-
-class TiendaDetailView(generics.RetrieveUpdateDestroyAPIView):
+class TiendaViewSet(viewsets.ModelViewSet):
     queryset = Tienda.objects.all()
     serializer_class = TiendaSerializer
 
     def get_permissions(self):
-        if self.request.method == 'GET':
-            #Solo los usuarios compradores y los administradores pueden ver detalles de tiendas
+        if self.action == 'list':
             return [EsUsuarioComprador()]
-        elif self.request.method == 'PUT':
-            #solo los propietarios pueden actualizar su tienda
-            return [EsPropietario()]
-        elif self.request.method == 'DELETE':
-            #solo los propietarios y administradores pueden eliminar una tienda
-            return [EsPropietario()]
-        return [permissions.IsAuthenticated()]
+        elif self.action == 'create':
+            return [EsUsuarioTienda()]
+        elif self.action == 'retrieve':
+            return [EsUsuarioComprador()]
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            return [IsOwner()]
+        return super().get_permissions()
     
+    def get_object(self):
+        obj = super().get_object()
+        self.check_object_permissions(self.request, obj)
+        return obj
+
+    def perform_create(self, serializer):
+        #Verifica si el usuario es un propietario
+        if self.request.user.rol == 'propietario':
+            propietario = Propietario.objects.get(id=self.request.user.id)
+            serializer.save(propietario=propietario)
+        else:
+            raise serializers.ValidationError("El usuario autenticado no es propetario")

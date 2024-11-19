@@ -3,28 +3,47 @@ from .models import Tienda, ProductoCentral, InventarioProducto
 from categorias.serializers import CategoriaSerializer
 
 class ProductoCentralSerializer(serializers.ModelSerializer):
-    categoria = CategoriaSerializer()
+    categoria_nombre = serializers.SerializerMethodField()
 
     class Meta:
         model = ProductoCentral
-        fields = ['id', 'nombre', 'descripcion', 'categoria']
+        fields = ['id', 'nombre', 'descripcion', 'categoria_nombre']
+
+    def get_categoria_nombre(self, obj):
+        return obj.categoria.nombre
 
 class InventarioProductoSerializer(serializers.ModelSerializer):
     tienda_nombre = serializers.SerializerMethodField()
-    producto_central = ProductoCentralSerializer()
+    producto_central_nombre = serializers.SerializerMethodField()
+    categoria_nombre = serializers.SerializerMethodField()
 
     class Meta:
         model = InventarioProducto
-        fields = ['id', 'producto_central', 'cantidad', 'precio_personalizado', 'resenna', 'tienda_nombre']
+        fields = ['id', 'cantidad', 'precio_personalizado', 'resenna', 'tienda_nombre',
+                   'producto_central_nombre', 'categoria_nombre']
 
     def get_tienda_nombre(self, obj):
         return obj.inventario.tienda.nombre
+    
+    def get_producto_central_nombre(self, obj):
+        return obj.producto_central.nombre
+    
+    def get_categoria_nombre(self, obj):
+        return obj.producto_central.categoria.nombre
 
 
 class TiendaSerializer(serializers.ModelSerializer):
+    nombre_propietario = serializers.SerializerMethodField()
+
     class Meta:
         model = Tienda
-        fields = '__all__'
+        fields = ['id', 'nombre', 'direccion', 'descripcion', 'nombre_propietario']
+        extra_kwargs = {
+            'propietario': {'read_only': True}
+        }
+    
+    def get_nombre_propietario(self, obj):
+        return obj.propietario.first_name
 
     def validate_propietario(self, data):
         if data.rol != 'propietario':
