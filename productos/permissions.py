@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission
+from usuarios.models import Propietario
 
 class EsCompradorOPropietario(BasePermission):
     def has_permission(self, request, view):
@@ -8,7 +9,9 @@ class EsCompradorOPropietario(BasePermission):
 
         # Verificar si el usuario es propietario de la tienda
         tienda_id = view.kwargs['tienda_id']
-        return request.user.tiendas.filter(id=tienda_id).exists()
+        if request.user.rol == 'propietario':
+            propietario = Propietario.objects.get(id=request.user.id)
+            return propietario.tiendas.filter(id=tienda_id).exists()
 
 class IsOwner(BasePermission):
     """
